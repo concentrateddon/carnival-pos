@@ -1,6 +1,6 @@
 // Offline support: pre-cache the whole app on install, then serve from cache.
 // Bump VERSION (and APP_VERSION in js/app.js) whenever any file below changes.
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 const CACHE = `carnival-pos-${VERSION}`;
 
 const FILES = [

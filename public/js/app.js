@@ -8,7 +8,7 @@ import {
 } from './tickets.js';
 import { unlockAudio, success, failure, tick, setKeepAwake } from './feedback.js';
 
-const APP_VERSION = '1.0.0'; // keep in step with VERSION in sw.js
+const APP_VERSION = '1.0.1'; // keep in step with VERSION in sw.js
 const MAX_AWARD = 999;
 const OK_RESULT_MS = 4000;
 const LOCK_MS = 1200; // ignore re-reads right after a tap/write so one tap is never handled twice

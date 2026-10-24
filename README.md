@@ -209,6 +209,7 @@ The Cash Station ([carnival-manager](https://github.com/concentrateddon/carnival
 - A type may not appear twice. If it does, counts are added together on read.
 - Records that aren't `NAME=COUNT` text (URLs, notes, other apps' data) are **preserved unchanged** on every write.
 - Records are written sorted by name, with preserved foreign records at the end.
+- **A card with nothing on it** (for example after its last ticket is spent) is written as the single record `GAME=0`. Web NFC refuses to write a message with no records, and this placeholder reads as "zero tickets" to every consumer.
 - Space: about 15 bytes per ticket type. A card with five types uses well under 100 bytes, so even an NTAG213 (144 bytes) copes. The app refuses to write over the NTAG215 limit (492 usable bytes).
 - **No signatures or checksums.** Tickets are plain text. Anyone with an NFC app can edit a card, which is acceptable for a community event. If that changes, add signing in `tickets.js` on both sides.
 - **Writing:** the app rewrites the whole message with `NDEFReader.write({ records }, { overwrite: true })` right after reading, while the card is still against the phone. After a failed write it remembers what it tried; if the next tap shows the card already holds the intended result, it completes the transaction instead of repeating it.

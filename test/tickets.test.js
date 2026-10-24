@@ -1,7 +1,7 @@
 // Runs in a browser (open test/index.html via any static server) or in Node:
 //   node test/tickets.test.js
 import {
-  parseTicketText, parseCard, serializeCard, fingerprint, grillItems,
+  parseTicketText, parseCard, serializeCard, EMPTY_RECORD, fingerprint, grillItems,
   removeTickets, addTickets, estimateBytes, getCount, MAX_COUNT, CARD_BYTES,
 } from '../public/js/tickets.js';
 
@@ -41,6 +41,24 @@ test('duplicate ticket records are summed', () => {
 test('serialize drops zero counts and sorts', () => {
   const card = { tickets: { PRIZE: 4, GAME: 0, 'GRILL:MEAL': 1, GRILL: 2 }, extras: [] };
   eq(serializeCard(card).map((r) => r.text), ['GRILL=2', 'GRILL:MEAL=1', 'PRIZE=4']);
+});
+
+test('an empty card still serializes to a writable message', () => {
+  const recs = serializeCard({ tickets: { GAME: 0 }, extras: [] });
+  eq(recs, [EMPTY_RECORD]);
+  const back = parseCard(recs);
+  eq(fingerprint(back), '');
+  eq(serializeCard(parseCard(recs)), [EMPTY_RECORD]);
+});
+
+test('placeholder disappears once real tickets are added', () => {
+  const card = addTickets(parseCard([EMPTY_RECORD]), 'GAME', 2);
+  eq(serializeCard(card).map((r) => r.text), ['GAME=2']);
+});
+
+test('spending the last ticket leaves a writable card', () => {
+  const card = removeTickets(parseCard([text('PRIZE=3')]), 'PRIZE', 3);
+  eq(serializeCard(card), [EMPTY_RECORD]);
 });
 
 test('round trip preserves extras', () => {

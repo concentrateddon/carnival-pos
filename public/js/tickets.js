@@ -1,5 +1,5 @@
 // Ticket model + card format. Pure functions, no DOM or NFC access, so the
-// same rules can be shared with the carnival-manager companion app.
+// same rules are shared with the carnival-manager companion app (keep the two copies in sync).
 //
 // Card format: one NDEF text record per ticket type, "NAME=COUNT".
 //   GAME=2   GRILL=1   GRILL:MEAL=3   GRILL:BEVERAGE=1   PRIZE=15
@@ -46,11 +46,18 @@ export function parseCard(records) {
   return card;
 }
 
+/**
+ * Web NFC refuses to write a message with no records, so a card with nothing on it
+ * gets this placeholder. It parses as a zero count, which every consumer ignores.
+ */
+export const EMPTY_RECORD = { recordType: 'text', text: 'GAME=0' };
+
 /** Inverse of parseCard. Zero-count types are dropped. */
 export function serializeCard(card) {
   const names = Object.keys(card.tickets).filter((n) => card.tickets[n] > 0).sort();
   const records = names.map((n) => ({ recordType: 'text', text: formatTicket(n, card.tickets[n]) }));
-  return records.concat(card.extras || []);
+  const all = records.concat(card.extras || []);
+  return all.length ? all : [{ ...EMPTY_RECORD }];
 }
 
 /** Rough NDEF size in bytes, used to refuse a write that cannot fit. */
